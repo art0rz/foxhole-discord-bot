@@ -1,0 +1,21 @@
+{
+	"include": ["src", "**/.*"],
+	"exclude": ["node_modules"],
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "es6",
+		"lib": ["es5", "dom", "es2019", "esnext"],
+		"allowJs": true,
+		"baseUrl": "src",
+		"noImplicitAny": false,
+		"strict": true,
+		"skipLibCheck": true,
+		"moduleResolution": "node",
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"noEmitOnError": true,
+		"outDir": "build"
+	}
+}
