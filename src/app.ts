@@ -33,9 +33,9 @@ async function app() {
 
 			es.addEventListener('event', function messageCallback(event: MessageEvent<string>) {
 				const data = JSON.parse(event.data) as WorldEvent;
-				const message = `**${data.mapName}** - **${data.town}** was **${data.action.toLowerCase()}** by **__${
-					data.team
-				}__** on day ${data.day} @ <t:${data.time}:f> (<t:${data.time}:R>)`;
+				const action =
+					data.action.toLowerCase() === 'construction' ? 'under construction' : data.action.toLowerCase();
+				const message = `**${data.mapName}** - **${data.town}** was **${action}** by **__${data.team}__** on day ${data.day} @ <t:${data.time}:f> (<t:${data.time}:R>)`;
 				log('New EventSource message:', message);
 				sendDiscordMessage(discordWebhookUrl, message);
 				saveLastEventId(data.id);
