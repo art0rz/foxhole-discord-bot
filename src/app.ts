@@ -1,6 +1,6 @@
 import debug from 'debug';
 import EventSource from 'eventsource';
-import getLastEventId from './lib/getLastEventId';
+import getLastEventId, { saveLastEventId } from './lib/getLastEventId';
 import { WorldEvent } from './lib/api';
 import sendDiscordMessage from './lib/sendDiscordMessage';
 import getRequiredEnvironmentVariable from './lib/getRequiredEnvironmentVariable';
@@ -15,6 +15,7 @@ async function app() {
 	return new Promise<void>(resolve => {
 		(async () => {
 			const lastEventId = await getLastEventId(foxholeStatsDomain, foxholeStatsPort);
+			saveLastEventId(lastEventId);
 
 			log(`Using lastEventId ${lastEventId}`);
 
@@ -37,6 +38,7 @@ async function app() {
 				}__** on day ${data.day} @ <t:${data.time}:f> (<t:${data.time}:R>)`;
 				log('New EventSource message:', message);
 				sendDiscordMessage(discordWebhookUrl, message);
+				saveLastEventId(data.id);
 			});
 
 			es.addEventListener('error', function error(err) {

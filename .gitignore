@@ -18,6 +18,9 @@ jspm_packages/
 # Optional eslint cache
 .eslintcache
 
+# Temp files
+lasteventid
+
 # misc
 .DS_Store
 .idea
