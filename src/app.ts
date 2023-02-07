@@ -11,6 +11,11 @@ const discordWebhookUrl = getRequiredEnvironmentVariable('DISCORD_WEBHOOK_URL');
 const foxholeStatsDomain = getRequiredEnvironmentVariable('FOXHOLESTATS_DOMAIN');
 const foxholeStatsPort = getRequiredEnvironmentVariable('FOXHOLESTATS_PORT');
 
+const teamColors = {
+	wardens: 0x629aed,
+	colonials: 0x54c53d,
+};
+
 async function app() {
 	return new Promise<void>(resolve => {
 		(async () => {
@@ -31,14 +36,32 @@ async function app() {
 				resolve();
 			});
 
-			es.addEventListener('event', function messageCallback(event: MessageEvent<string>) {
+			es.addEventListener('event', async function messageCallback(event: MessageEvent<string>) {
 				const data = JSON.parse(event.data) as WorldEvent;
 				const action =
 					data.action.toLowerCase() === 'construction' ? 'under construction' : data.action.toLowerCase();
-				const message = `**${data.mapName}** - **${data.town}** was **${action}** by **__${data.team}__** on day ${data.day} @ <t:${data.time}:f> (<t:${data.time}:R>)`;
-				log('New EventSource message:', message);
-				sendDiscordMessage(discordWebhookUrl, message);
-				saveLastEventId(data.id);
+				log('New EventSource message:', JSON.stringify(data));
+				try {
+					await sendDiscordMessage(discordWebhookUrl, {
+						content: null,
+						embeds: [
+							{
+								title: `${action.toUpperCase()}`,
+								description: `by **${data.team.toUpperCase()}** @ <t:${data.time}:f> (<t:${
+									data.time
+								}:R>)`,
+								color: teamColors[data.team.toLowerCase()],
+								author: {
+									name: `${data.mapName} - ${data.town}`,
+								},
+							},
+						],
+					});
+
+					saveLastEventId(data.id);
+				} catch (e) {
+					// no op
+				}
 			});
 
 			es.addEventListener('error', function error(err) {
