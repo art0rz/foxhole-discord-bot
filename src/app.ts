@@ -19,7 +19,7 @@ const teamColors = {
 async function app() {
 	return new Promise<void>(resolve => {
 		(async () => {
-			const lastEventId = await getLastEventId(foxholeStatsDomain, foxholeStatsPort);
+			let lastEventId = await getLastEventId(foxholeStatsDomain, foxholeStatsPort);
 			saveLastEventId(lastEventId);
 
 			log(`Using lastEventId ${lastEventId}`);
@@ -38,6 +38,9 @@ async function app() {
 
 			es.addEventListener('event', async function messageCallback(event: MessageEvent<string>) {
 				const data = JSON.parse(event.data) as WorldEvent;
+				if (data.id <= lastEventId) {
+					return;
+				}
 				const action =
 					data.action.toLowerCase() === 'construction' ? 'under construction' : data.action.toLowerCase();
 				log('New EventSource message:', JSON.stringify(data));
@@ -59,6 +62,7 @@ async function app() {
 					});
 
 					saveLastEventId(data.id);
+					lastEventId = data.id;
 				} catch (e) {
 					// no op
 				}
